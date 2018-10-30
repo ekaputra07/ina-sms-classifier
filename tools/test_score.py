@@ -14,8 +14,8 @@ import pandas
 import csv
 
 data = pandas.read_csv('../dataset/sms.csv', encoding='utf-8', sep="|", na_values=["NULL"])
-train_data = data[:49000] # 4400 items
-test_data = data[49000:] # 1172 items
+train_data = data[:30376]
+test_data = data[30376:]
 
 classifier = OneVsRestClassifier(SVC(kernel='linear'))
 #vectorizer = TfidfVectorizer()
