@@ -24,7 +24,7 @@ def message_cleaner(message):
 
 def clean(in_file, out_file):
     df = pd.read_json(in_file, lines=True)
-    df = df[['message', 'type']]
+    df = df[['type', 'message']]
 
     # convert type to 1 and 0
     # Penipuan = 1, else = 0
