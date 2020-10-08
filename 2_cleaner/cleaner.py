@@ -17,8 +17,8 @@ def message_cleaner(message):
     # get all words (ignore number)
     match = re.findall("[a-zA-Z]+", message)
 
-    # take words that has length > 3
-    filtered = filter(lambda w: len(w) > 3, match)
+    # take words that has length > 2
+    filtered = filter(lambda w: len(w) > 2, match)
     return ' '.join(filtered)
 
 
