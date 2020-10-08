@@ -1,1 +1,0 @@
-This is a web scraper for laporsms.com.
