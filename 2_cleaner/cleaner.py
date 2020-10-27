@@ -23,13 +23,9 @@ def message_cleaner(message):
 
 
 def clean(in_file, out_file):
-    df = pd.read_json(in_file, lines=True)
-    df = df[['type', 'message']]
+    df = pd.read_csv(in_file)
+    df = df[['label', 'message']]
 
-    # convert type to 1 and 0
-    # Penipuan = 1, else = 0
-    # NOTE: this is not final label, many of the label are wrong, need to verify manually before used for training.
-    df['type'] = df['type'].apply(lambda t: 1 if t == 'Penipuan' else 0)
     df['message'] = df['message'].apply(message_cleaner)
 
     # remove duplicates
@@ -40,9 +36,9 @@ def clean(in_file, out_file):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Dataset cleaner')
     parser.add_argument(
-        '--jl-in',
+        '--csv-in',
         required=True,
-        help='Input file to cleanup (must be Jsonline from scrapper)'
+        help='Input file to cleanup (CSV)'
     )
     parser.add_argument(
         '--csv-out',
@@ -51,7 +47,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    input_file = args.jl_in
+    input_file = args.csv_in
     output_file = args.csv_out
 
     clean(input_file, output_file)

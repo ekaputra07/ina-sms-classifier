@@ -8,7 +8,7 @@ def convert(in_file, out_file):
     df['message'] = df['message'].apply(
         lambda m: m.strip().lower().replace('\n', ' '))
     # remove duplicates
-    df.drop_duplicates(subset=['type', 'message'], inplace=True)
+    df.drop_duplicates(subset=['message'], inplace=True)
 
     df.to_csv(out_file, index=False)
 
