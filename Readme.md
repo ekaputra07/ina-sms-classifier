@@ -1,6 +1,6 @@
 # ina-sms-classifier
 
-A project to create Machine Learning model to classify Indonesian text/sms messages using [Tensorflow](https://www.tensorflow.org) via its [Keras](https://keras.io) api.
+A project to create Machine Learning model to classify Indonesian text/sms messages using [Tensorflow](https://www.tensorflow.org) using its [Keras](https://keras.io) api.
 
 The main puspose is **to be able to detect scam/fraud SMS that often received by mobile phone users in Indonesia from unknown person and many have been reported to be victims of this kind of fraud activity**.
 
@@ -14,7 +14,6 @@ For now, it will classify messages into 4 classes:
 - Others (3)
 
 Thanks to [laporsms.com](https://laporsms.com) for their effort collecting all the data that I've been using in this project.
-
 
 ```
 Copyright (C) 2020  Eka Putra

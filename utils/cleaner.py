@@ -4,6 +4,18 @@ import pandas as pd
 import argparse
 
 
+def basic_cleaner(text):
+    """
+    Do some basic cleaning
+    """
+    # get all words (ignore number)
+    words = re.findall("[a-zA-Z]+", str(text))
+
+    # take words that has length > 2
+    filtered = filter(lambda w: len(w) > 2, words)
+    return ' '.join(filtered)
+
+
 def message_cleaner(message):
     """
     Do some basic cleaning
