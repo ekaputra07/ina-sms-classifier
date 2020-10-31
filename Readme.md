@@ -15,9 +15,9 @@ For now, it will classify messages into 4 classes:
 
 Thanks to [laporsms.com](https://laporsms.com) for their effort collecting all the data that I've been using in this project.
 
-### Usage
+## Usage
 
-#### Create text tokenizer
+### Create text tokenizer
 ```
 >> python create_tokenizer.py -h
 
@@ -43,7 +43,7 @@ python create_tokenizer.py \
 --text-column message
 ```
 
-#### Train and save the model
+### Train and save the model
 
 ```
 >> python create_model.py -h                                                                                                                                  
@@ -89,6 +89,18 @@ python create_model.py \
 ```
 
 At the end of the training you'll be asked whether you want to save the model, if yes then the model will be saved to `/model/latest`
+
+### Model performance from latest training
+
+```
+=====================================
+LOSS: 0.21
+ACCURACY: 0.93
+=====================================
+```
+
+![Plot LOSS](https://github.com/ekaputra07/ina-sms-classifier/blob/master/plot_loss.png?raw=true)
+![Plot ACC](https://github.com/ekaputra07/ina-sms-classifier/blob/master/plot_acc.png?raw=true)
 
 ```
 Copyright (C) 2020  Eka Putra
