@@ -102,6 +102,18 @@ ACCURACY: 0.93
 ![Plot LOSS](https://github.com/ekaputra07/ina-sms-classifier/blob/master/plot_loss.png?raw=true)
 ![Plot ACC](https://github.com/ekaputra07/ina-sms-classifier/blob/master/plot_acc.png?raw=true)
 
+### Development
+
+I recommends you to install all the dependencies using [Conda]() and install the following libraries:
+```
+tensorflow
+pandas
+numpy
+matplotlib
+seaborn
+```
+
+### License
 ```
 Copyright (C) 2020  Eka Putra
 
