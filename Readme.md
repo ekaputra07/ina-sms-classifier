@@ -1,6 +1,6 @@
 # ina-sms-classifier
 
-A project to create Machine Learning model to classify Indonesian text/sms messages using [Tensorflow](https://www.tensorflow.org) using its [Keras](https://keras.io) api.
+A project to create Machine Learning model to classify Indonesian text/sms messages using [Tensorflow](https://www.tensorflow.org) and its [Keras](https://keras.io) api.
 
 The main puspose is **to be able to detect scam/fraud SMS that often received by mobile phone users in Indonesia from unknown person and many have been reported to be victims of this kind of fraud activity**.
 
@@ -14,6 +14,81 @@ For now, it will classify messages into 4 classes:
 - Others (3)
 
 Thanks to [laporsms.com](https://laporsms.com) for their effort collecting all the data that I've been using in this project.
+
+### Usage
+
+#### Create text tokenizer
+```
+>> python create_tokenizer.py -h
+
+usage: create_tokenizer.py [-h] --input INPUT [--text-column TEXT_COLUMN] [--max-words MAX_WORDS] --output OUTPUT
+
+Create tokenizer object file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input INPUT         Input file to read (must be CSV file)
+  --text-column TEXT_COLUMN
+                        Name of the text column
+  --max-words MAX_WORDS
+                        Maximum number of words to use when tokenize sentences (default: 20000)
+  --output OUTPUT       Where to store the tokenizer object
+```
+
+Example:
+```
+python create_tokenizer.py \
+--input dataset/sms-row.csv \
+--output model/tokenizer.pkl \
+--text-column message
+```
+
+#### Train and save the model
+
+```
+>> python create_model.py -h                                                                                                                                  
+
+usage: create_model.py [-h] --tokenizer TOKENIZER --dataset DATASET [--text-column TEXT_COLUMN] [--label-column LABEL_COLUMN] [--max-words MAX_WORDS] [--maxlen MAXLEN] [--emb-dim EMB_DIM] [--class-num CLASS_NUM]
+                       [--val-split VAL_SPLIT] [--test-split TEST_SPLIT] [--epochs EPOCHS] [--batch-size BATCH_SIZE] --output OUTPUT
+
+Train and save model
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --tokenizer TOKENIZER
+                        Path to saved tokenizer
+  --dataset DATASET     Path to dataset file (must be CSV)
+  --text-column TEXT_COLUMN
+                        Name of the text column (default: text)
+  --label-column LABEL_COLUMN
+                        Name of the label column (default: label)
+  --max-words MAX_WORDS
+                        Max. number of words in vocabulary (must match tokenizer max-words, default: 20000)
+  --maxlen MAXLEN       Max. number of words per message to use in training (default: 50)
+  --emb-dim EMB_DIM     Words embedding dimension (default: 8)
+  --class-num CLASS_NUM
+                        Number of output classes (default: 4)
+  --val-split VAL_SPLIT
+                        Ratio of validation split (default: 0.2)
+  --test-split TEST_SPLIT
+                        Ratio of test split (default: 0.2)
+  --epochs EPOCHS       Training epochs (default: 10)
+  --batch-size BATCH_SIZE
+                        Training batch size (default: 512)
+  --output OUTPUT       Where to store the model
+```
+
+Example:
+```
+python create_model.py \
+--tokenizer model/tokenizer.pkl \
+--dataset dataset/sms-labeled-3k-clean.csv \
+--text-column message \
+--output model/model.tf
+--epochs 75
+```
+
+At the end of the training you'll be asked whether you want to save the model, if yes then the model will be saved to `/model/latest`
 
 ```
 Copyright (C) 2020  Eka Putra

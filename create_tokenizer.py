@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument(
         '--max-words',
         default=20000,
-        help='Maximum number of words to use when tokenize sentences'
+        help='Maximum number of words to use when tokenize sentences (default: 20000)'
     )
     parser.add_argument(
         '--output',
@@ -58,7 +58,3 @@ if __name__ == '__main__':
 
     with open(output_file, 'wb') as f:
         pickle.dump(tokenizer, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-    # how to load tokenizer
-    # with open(output_file, 'rb') as f:
-    #     t = pickle.load(f)
