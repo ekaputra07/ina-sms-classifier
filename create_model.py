@@ -4,8 +4,13 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report
+
+from tensorflow.keras.metrics import CategoricalAccuracy, Precision, Recall, AUC
 from tensorflow.keras import models, layers
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.utils import to_categorical
 
 from utils.cleaner import basic_cleaner
 
@@ -90,6 +95,11 @@ def get_args():
         required=True,
         help='Where to store the model'
     )
+    parser.add_argument(
+        '--test',
+        action='store_true',
+        help='Whether to evaluate the test set, otherwise it will only run training and show validation metrics'
+    )
     return parser.parse_args()
 
 
@@ -103,15 +113,6 @@ def get_tokenizer(path):
     return tokenizer
 
 
-def train_test_split(data, labels, test_ratio):
-    """
-    Split train and test dataset.
-    """
-    total = data.shape[0]
-    test_max_index = int(total * test_ratio)
-    return (data[test_max_index:], labels[test_max_index:]), (data[:test_max_index], labels[:test_max_index])
-
-
 def get_model(max_words, maxlen, emb_dim=8, output=4):
     """
     Returns multiclass classification model
@@ -121,8 +122,14 @@ def get_model(max_words, maxlen, emb_dim=8, output=4):
         layers.Flatten(),
         layers.Dense(output, activation='softmax')  # 4 probability output
     ])
+    metrics = [
+        CategoricalAccuracy(),
+        Precision(),
+        Recall(),
+        AUC()
+    ]
     model.compile(optimizer='rmsprop',
-                  loss='sparse_categorical_crossentropy', metrics=['acc'])
+                  loss='categorical_crossentropy', metrics=metrics)
     return model
 
 
@@ -134,8 +141,8 @@ def render_metrics(epochs, history):
     """
     train_loss = history['loss']
     val_loss = history['val_loss']
-    train_acc = history['acc']
-    val_acc = history['val_acc']
+    train_acc = history['categorical_accuracy']
+    val_acc = history['val_categorical_accuracy']
 
     plt.plot(range(1, epochs+1), train_loss, 'b', label='Training loss')
     plt.plot(range(1, epochs+1), val_loss, 'bo', label='Validation loss')
@@ -151,6 +158,30 @@ def render_metrics(epochs, history):
     plt.ylabel('accuracy')
     plt.legend()
     plt.savefig('plot_acc.png')
+
+
+def show_evaluation_result(step, result):
+    """
+    Show result of model.evaluate()
+    """
+    print('\n\n================== {} ==================='.format(step))
+    print('LOSS\t\t: {:.5f}'.format(result[0]))
+    print('ACCURACY\t: {:.5f}'.format(result[1]))
+    print('PRECISION\t: {:.5f}'.format(result[2]))
+    print('RECALL\t\t: {:.5f}'.format(result[3]))
+    print('AUC\t\t: {:.5f}'.format(result[4]))
+
+
+def show_classification_report(y_true, y_pred):
+    """
+    Show confusion matrix and classification report
+    """
+    print('\nCONFUSION MATRIX:')
+    print(confusion_matrix(y_true=y_true,
+                           y_pred=y_pred))
+
+    print('\nCLASSIFICATION REPORT:')
+    print(classification_report(y_true=y_true, y_pred=y_pred))
 
 
 if __name__ == '__main__':
@@ -169,8 +200,8 @@ if __name__ == '__main__':
     # load tokenizer
     tokenizer = get_tokenizer(args.tokenizer)
 
-    labels = shuffled[args.label_column].values
     texts = shuffled[args.text_column].values
+    labels = to_categorical(shuffled[args.label_column].values)
 
     # tokenize texts
     tokens = tokenizer.texts_to_sequences(texts)
@@ -178,30 +209,57 @@ if __name__ == '__main__':
     # pad sequences
     data = pad_sequences(tokens, maxlen=args.maxlen)
 
-    # split raining & test data
-    (x_train, y_train), (x_test, y_test) = train_test_split(
-        data, labels, args.test_split)
+    # split train & test data
+    X_train, X_test, y_train, y_test = train_test_split(
+        data, labels, test_size=args.test_split, random_state=85)
+
+    # get a portion of validation data from training data
+    X_train2, X_val, y_train2, y_val = train_test_split(
+        X_train, y_train, test_size=args.val_split, random_state=85)
 
     # create model
     model = get_model(args.max_words, args.maxlen,
-                      emb_dim=args.emb_dim, output=args.class_num)
+                      emb_dim=args.emb_dim,
+                      output=args.class_num)
 
     # train
-    hist = model.fit(x_train, y_train, epochs=args.epochs,
-                     batch_size=args.batch_size, validation_split=args.val_split)
+    hist = model.fit(X_train2, y_train2,
+                     epochs=args.epochs,
+                     batch_size=args.batch_size,
+                     validation_data=(X_val, y_val),
+                     verbose=0)
 
     # display metrics
     render_metrics(args.epochs, hist.history)
 
-    # evaluate model
-    result = model.evaluate(x_test, y_test)
-    print('=====================================')
-    print('LOSS: {:.2f}'.format(result[0]))
-    print('ACCURACY: {:.2f}'.format(result[1]))
-    print('=====================================')
+    # evaluate using validation data
+    val_result = model.evaluate(X_val, y_val)
+    if not args.test:
+        show_evaluation_result('VALIDATION', val_result)
 
-    # save the model?
-    save_model = input("Save model to disk? [y/N]: ")
-    if save_model.lower() == 'y':
-        model.save(args.output)
-        print('Model saved to {}'.format(args.output))
+    else:
+        # Create new model and train using the whole training dataset
+        model2 = get_model(args.max_words, args.maxlen,
+                           emb_dim=args.emb_dim,
+                           output=args.class_num)
+        model2.fit(X_train, y_train,
+                   epochs=args.epochs,
+                   batch_size=args.batch_size,
+                   verbose=0)
+
+        # evaluate model
+        test_result = model2.evaluate(X_test, y_test)
+
+        # show both training and test result so we can compare them
+        show_evaluation_result('VALIDATION', val_result)
+        show_evaluation_result('TEST', test_result)
+
+        predictions = model2.predict(X_test)
+        show_classification_report(y_true=np.argmax(y_test, axis=1),
+                                   y_pred=np.argmax(predictions, axis=1))
+
+        # save the model?
+        save_model = input("Save model to disk? (y/[N]): ")
+        if save_model.lower() == 'y':
+            model2.save(args.output)
+            print('Model saved to {}'.format(args.output))

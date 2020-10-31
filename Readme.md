@@ -92,11 +92,40 @@ At the end of the training you'll be asked whether you want to save the model, i
 
 ### Model performance from latest training
 
+*NOTE: below results are based on training 2700 of datapoints that are labeled from total of 18K (labeling all of them not finish yet).*
 ```
-=====================================
-LOSS: 0.21
-ACCURACY: 0.93
-=====================================
+================== VALIDATION ===================
+LOSS            : 0.13091
+ACCURACY        : 0.94737
+PRECISION       : 0.96234
+RECALL          : 0.93117
+AUC             : 0.99760
+
+
+================== TEST ===================
+LOSS            : 0.21565
+ACCURACY        : 0.93091
+PRECISION       : 0.94424
+RECALL          : 0.92364
+AUC             : 0.99164
+
+CONFUSION MATRIX:
+[[128   1   2   0]
+ [  1  30   0   0]
+ [  0   2  80   3]
+ [  9   0   1  18]]
+
+CLASSIFICATION REPORT:
+              precision    recall  f1-score   support
+
+           0       0.93      0.98      0.95       131
+           1       0.91      0.97      0.94        31
+           2       0.96      0.94      0.95        85
+           3       0.86      0.64      0.73        28
+
+    accuracy                           0.93       275
+   macro avg       0.91      0.88      0.89       275
+weighted avg       0.93      0.93      0.93       275
 ```
 
 ![Plot LOSS](https://github.com/ekaputra07/ina-sms-classifier/blob/master/plot_loss.png?raw=true)
@@ -107,6 +136,7 @@ ACCURACY: 0.93
 I recommends you to install all the dependencies using [Conda]() and install the following libraries:
 ```
 tensorflow
+scikit-learn
 pandas
 numpy
 matplotlib
