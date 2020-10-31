@@ -203,5 +203,5 @@ if __name__ == '__main__':
     # save the model?
     save_model = input("Save model to disk? [y/N]: ")
     if save_model.lower() == 'y':
-        model.save('model/latest')
-        print('Model saved to model/latest')
+        model.save(args.output)
+        print('Model saved to {}'.format(args.output))
