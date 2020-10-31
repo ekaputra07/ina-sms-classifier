@@ -84,7 +84,7 @@ python create_model.py \
 --tokenizer model/tokenizer.pkl \
 --dataset dataset/sms-labeled-3k-clean.csv \
 --text-column message \
---output model/model.tf
+--output model/latest
 --epochs 75
 ```
 
