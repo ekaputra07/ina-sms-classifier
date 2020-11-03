@@ -6,10 +6,9 @@ def convert(in_file, out_file):
     df = pd.read_json(in_file, lines=True)
     df = df[['type', 'message', 'sender']]
     df['message'] = df['message'].apply(
-        lambda m: m.strip().lower().replace('\n', ' '))
+        lambda m: " ".join(m.strip().lower().split()))
     # remove duplicates
     df.drop_duplicates(subset=['message'], inplace=True)
-
     df.to_csv(out_file, index=False)
 
 
